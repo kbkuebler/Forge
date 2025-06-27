@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector
+  namespace: hammerspace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vector
+  template:
+    metadata:
+      labels:
+        app: vector
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8686"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: vector
+          image: timberio/vector:0.47.0-alpine
+          imagePullPolicy: IfNotPresent
+          args: ["--config", "/etc/vector/vector.yaml"]
+          ports:
+            - name: api
+              containerPort: 8686
+              protocol: TCP
+            - name: syslog-tcp
+              containerPort: 5140
+              protocol: TCP
+            - name: syslog-udp
+              containerPort: 5140
+              protocol: UDP
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+          volumeMounts:
+            - name: vector-config
+              mountPath: /etc/vector
+      volumes:
+        - name: vector-config
+          configMap:
+            name: vector-config
+

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mkdocs
+  namespace: hammerspace
+  labels:
+    app: mkdocs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mkdocs
+  template:
+    metadata:
+      labels:
+        app: mkdocs
+    spec:
+      containers:
+        - name: mkdocs
+          image: squidfunk/mkdocs-material:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          workingDir: /mkdocs
+          command: ["mkdocs", "serve", "--dev-addr=0.0.0.0:8000"]
+          volumeMounts:
+            - name: mkdocs-docs
+              mountPath: /mkdocs
+      volumes:
+        - name: mkdocs-docs
+          hostPath:
+            path: /opt/forge/docs
+            type: Directory
+

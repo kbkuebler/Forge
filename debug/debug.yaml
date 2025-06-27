@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-tools
+  namespace: hammerspace
+spec:
+  containers:
+    - name: tools
+      image: nicolaka/netshoot
+      command: ["sleep", "3600"]
+      securityContext:
+        privileged: true
+  restartPolicy: Never
+

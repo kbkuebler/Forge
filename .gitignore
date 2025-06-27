@@ -1,0 +1,23 @@
+.venv/
+
+
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Generated files
+.generated/
+
+archive/
+# Secrets (if ever generated for review)
+*.secret.yaml
+*.env
+
+# IDE/editor config
+.vscode/
+.idea/
+*.swp
+

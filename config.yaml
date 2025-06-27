@@ -1,0 +1,37 @@
+clusters:
+  - name: forge.twocupsof.coffee
+    cluster_ip: 192.168.100.200
+    ports:
+      metrics: 9100
+      api: 9101
+      c_metrics: 9102
+      c_advisor: 9103
+    labels:
+      env: lab
+      region: east
+
+hammerspace:
+  username: admin
+  password: 1Hammerspace!
+
+apps:
+  grafana: true
+  prometheus: true
+  loki: true
+  vector: true
+  csi_driver: true
+  nicegui: true
+
+kubernetes:
+  namespace: se-toolkit
+  node_port_range: "30000-31000"
+
+networking:
+  expose_via_nodeport: true
+
+global:
+  prometheus:
+    scrape_interval: 15s
+    evaluation_interval: 15s
+  namespace: hammerspace
+

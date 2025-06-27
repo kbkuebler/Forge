@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: hammerspace
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml
+
+configMapGenerator:
+  - name: prometheus-config
+    namespace: hammerspace
+    files:
+      - prometheus.yml=generated/prometheus.yml
+

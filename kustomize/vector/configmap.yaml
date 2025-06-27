@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vector-config
+  namespace: hammerspace
+data:
+  vector.yaml: |
+    data_dir: /vector-data-dir
+
+    # Enable more verbose logging
+    log_schema:
+      host_key: "host"
+      message_key: "message"
+      source_type_key: "source_type"
+      timestamp_key: "timestamp"
+
+    # API for health checks and metrics
+    api:
+      enabled: true
+      address: 0.0.0.0:8686
+      playground: false
+      graphql: false
+
+
+    # Syslog TCP source with structured parsing
+    sources:
+      syslog_tcp:
+        type: syslog
+        address: 0.0.0.0:5140
+        mode: tcp
+        max_length: 32768  # Increased for larger messages
+        host_key: "host"
+        message_key: "message"
+        timestamp_key: "timestamp"
+        framing:
+          method: newline_delimited
+        auth:
+          pass_through: true
+
+    # Syslog UDP source for compatibility
+      syslog_udp:
+        type: syslog
+        address: 0.0.0.0:5140
+        mode: udp
+        max_length: 32768
+        host_key: "host"
+        message_key: "message"
+        timestamp_key: "timestamp"
+
+    # Parse and enhance syslog messages
+    transforms:
+      parse_syslog:
+        type: remap
+        inputs: ["syslog_tcp", "syslog_udp"]
+        source: |
+          # Set basic fields with safe defaults
+          .source_type = "syslog"
+          .service = to_string(.appname) ?? "unknown"
+          .host = to_string(.hostname) ?? to_string(.host) ?? "unknown"
+          .source_ip = to_string(.source_ip) ?? "unknown"
+          .level = to_string(.severity) ?? "info"
+
+          # Ensure message is a string
+          .message = to_string(.message) ?? ""
+
+          # Set timestamp if not present
+          if !exists(.timestamp) {
+            .timestamp = now()
+          }
+
+          # Add Hammerspace specific fields if this is a Hammerspace log
+          if .appname == "Hammerspace" {
+            .is_hammerspace = true
+
+            # Parse event details when present
+            if contains(.message, "Description=") {
+              # Attempt to capture event type and description
+              event, err = parse_regex(
+                to_string(.message),
+                r"(?:(?:EventType)|(?:Type))=(?P<event_type>[^\s;]+).*?Description=\"?(?P<description>[^\";]+)"
+              )
+              if err == null {
+                .event_type = event.event_type
+                .description = event.description
+              }
+
+              # Add a prefix to indicate it's a Hammerspace event
+              .message = "Hammerspace Event: " + to_string(.message)
+            }
+          }
+
+    # Loki sink with enhanced labels for better querying
+    sinks:
+      loki:
+        type: loki
+        inputs: ["parse_syslog"]
+        endpoint: http://loki:3100
+        encoding:
+          codec: json
+        labels:
+          job: "vector"
+          host: "{{ host }}"
+          service: "{{ service }}"
+          level: "{{ level }}"
+          appname: "{{ appname }}"
+          event_type: "{{ event_type }}"
+          description: "{{ description }}"
+        request:
+          timeout_secs: 30
+          retry_attempts: 3
+          retry_initial_backoff_secs: 1
+
+    # Console sink for debugging (can be removed in production)
+      console:
+        type: console
+        inputs: ["parse_syslog"]
+        encoding:
+          codec: json
+        target: stdout

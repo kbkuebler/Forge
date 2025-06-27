@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: hammerspace
+data:
+  fluent-bit.yaml: |
+    service:
+      flush: 1
+      log_level: info
+      parsers_file: parsers.yaml
+
+    pipeline:
+      inputs:
+        - name: syslog
+          buffer_chunk_size: 128k
+          buffer_max_size: 512k
+          mode: udp
+          listen: 0.0.0.0
+          port: 32424
+          tag: hs.syslog.udp
+          parser: hammerspace_passthrough
+
+        - name: syslog
+          buffer_chunk_size: 128k
+          buffer_max_size: 512k
+          mode: tcp
+          listen: 0.0.0.0
+          port: 32424
+          tag: hs.syslog.tcp
+          parser: hammerspace_passthrough
+
+      filters:
+        - name: parser
+          match: "*"
+          key_name: message
+          parser: hammerspace_structured
+          preserve_key: true
+          reserve_data: true
+
+      outputs:
+        - name: loki
+          match: "*"
+          host: loki.hammerspace.svc.cluster.local
+          port: 3100
+          labels: job=hammerspace,event_type=$event_type,created_by=$created_by_name
+          line_format: json
+          auto_kubernetes_labels: off
+       
+        - name: stdout
+          match: "*"
+
+  parsers.yaml: |
+    parsers:
+      - name: hammerspace_passthrough
+        format: regex
+        regex: ^(?<message>.*)$
+        time_keep: on
+
+      - name: hammerspace_structured
+        format: regex
+        regex: "^<(?<pri>\\d+)>.*?Hammerspace:\\s+ClusterUUID=(?<cluster_uuid>[^\\s]+)\\s+Event\\s+\\[.*?type=(?<event_type>[A-Z_]+),.*?sourceName=(?<source_name>[^\\s,]+),\\s+severity=(?<severity>[A-Z]+),.*?createdById=Uoid\\s+\\[uuid=(?<created_by_id>[a-f0-9\\-]+),\\s*objectType=(?<created_by_type>[A-Z]+)\\],\\s+createdByName=(?<created_by_name>[^,]+),.*?\\]\\s+Description=(?<description>.+?)\\r?$"
+
+        time_keep: on
+

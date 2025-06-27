@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+  namespace: hammerspace
+spec:
+  selector:
+    app: fluent-bit
+  type: NodePort
+  ports:
+    - name: syslog-tcp
+      port: 32424
+      targetPort: 32424
+      nodePort: 32424
+      protocol: TCP
+    - name: syslog-udp
+      port: 32425
+      targetPort: 32425
+      nodePort: 32425
+      protocol: UDP
+

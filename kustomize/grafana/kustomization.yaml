@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: hammerspace
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - pvc.yaml
+
+configMapGenerator:
+  - name: grafana-datasources
+    files:
+      - datasources.yaml
+
+  - name: grafana-dashboard-providers
+    files:
+      - dashboardproviders.yaml=dashboardproviders/dashboardproviders.yaml
+
+  - name: grafana-dashboards
+    files:
+      - dashboards/hello-world.json
+      - dashboards/hs_fs_stats.json
+generatorOptions:
+  disableNameSuffixHash: true
+
