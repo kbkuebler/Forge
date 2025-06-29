@@ -4,6 +4,13 @@ set -euo pipefail
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+# Ensure .local/bin exists
+if [ ! -d "$HOME/.local/bin" ]; then
+    mkdir -p "$HOME/.local/bin"
+    echo -e "${GREEN}[*] Created .local/bin directory.${NC}"
+fi
+
+
 echo -e "${GREEN}[*] Creating SE Toolkit project structure...${NC}"
 
 mkdir -p scripts
