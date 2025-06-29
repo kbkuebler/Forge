@@ -111,5 +111,5 @@ echo "Dashboard:     http://$SERVER_ADDRESS:8080"
 echo "Grafana:       http://$SERVER_ADDRESS:32000"
 echo "Prometheus:    http://$SERVER_ADDRESS:32001"
 echo "Documentation: http://$SERVER_ADDRESS:32010"
-echo "${GREEN}\m/${NC}"
+echo -e "${GREEN}\m/${NC}"
 
