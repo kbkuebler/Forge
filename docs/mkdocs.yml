@@ -1,0 +1,14 @@
+site_name: Forge SE Toolkit Docs
+
+nav:
+  - Home: index.md
+  - To Do: status.md
+  - Unattended Install with qcow2: qcowUnattended.md
+  - Here is something: somecode.md
+theme:
+  name: material
+
+markdown_extensions:
+  - toc:
+      permalink: true
+

@@ -25,5 +25,5 @@ output_path.parent.mkdir(parents=True, exist_ok=True)
 with open(output_path, "w") as f:
     f.write(rendered)
 
-print(f"✓ Rendered Prometheus config to {output_path}")
+print(f"Rendered Prometheus config to {output_path}")
 

@@ -17,10 +17,10 @@ if [ ! -f "${TMP_DIR}/k9s" ]; then
     exit 1
 fi
 
-sudo mv "${TMP_DIR}/k9s" /usr/local/bin/k9s
-sudo chmod +x /usr/local/bin/k9s
+mv "${TMP_DIR}/k9s" "$HOME/.local/bin/k9s"
+chmod +x "$HOME/.local/bin/k9s"
 
 rm -rf "${TMP_DIR}"
 
-echo "[INFO] ✅ k9s ${VERSION} installed successfully. Run 'k9s' to get started."
+echo "[INFO] k9s ${VERSION} installed successfully. Run 'k9s' to get started."
 

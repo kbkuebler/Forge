@@ -148,9 +148,9 @@ def update_all_cards():
 
 
 def create_dashboard():
-    ui.page_title("Hammerspace Showcase")
+    ui.page_title("Hammerspace Forge")
     with ui.header().classes('justify-between items-center bg-blue-600 text-white p-4'):
-        ui.label('Hammerspace Showcase').classes('text-xl font-bold')
+        ui.label('Hammerspace Forge').classes('text-xl font-bold')
         ui.button('Refresh', icon='refresh').on('click', update_all_cards)\
             .classes('bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded').props('flat')
 
