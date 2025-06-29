@@ -5,6 +5,12 @@ echo "---------------------------------------------"
 echo "Setting up Forge SE Toolkit..."
 echo "---------------------------------------------"
 
+echo "---------------------------------------------"
+echo "[0] Setting up directories..."
+echo "---------------------------------------------"
+bash scripts/setup_directories.sh
+
+echo "Directories created..."
 # 1. ENVIRONMENT SETUP
 echo "[1] Installing Python and requirements..."
 bash scripts/install_python.sh

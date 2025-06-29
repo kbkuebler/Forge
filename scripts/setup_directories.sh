@@ -4,28 +4,16 @@ set -euo pipefail
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+
+
+
+echo -e "${GREEN}[*] Creating SE Toolkit project structure...${NC}"
+
 # Ensure .local/bin exists
 if [ ! -d "$HOME/.local/bin" ]; then
     mkdir -p "$HOME/.local/bin"
     echo -e "${GREEN}[*] Created .local/bin directory.${NC}"
 fi
-
-
-echo -e "${GREEN}[*] Creating SE Toolkit project structure...${NC}"
-
-mkdir -p scripts
-mkdir -p secrets
-mkdir -p dashboard
-mkdir -p kustomize
-mkdir -p kustomize/prometheus
-mkdir -p kustomize/loki
-mkdir -p kustomize/vector
-mkdir -p kustomize/csi-driver
-mkdir -p kustomize/grafana
-mkdir -p kustomize/base  # Optional: for shared configmaps/secrets, etc.
-
-touch config.yaml
-touch requirements.txt
 
 # Create starter .gitignore if it doesn't exist
 if [ ! -f ".gitignore" ]; then
