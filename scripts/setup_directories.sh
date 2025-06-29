@@ -24,5 +24,5 @@ elif ! grep -qxF ".venv/" .gitignore; then
     echo -e "${GREEN}[*] Appended .venv/ to .gitignore${NC}"
 fi
 
-echo -e "${GREEN}[✓] Directory structure created.${NC}"
+echo -e "${GREEN} Directory structure created.${NC}"
 

@@ -4,7 +4,7 @@ set -e
 BASHRC="$HOME/.bashrc"
 PROJECT_DIR="$(pwd)"
 
-echo "✨ Adding convenience functions to $BASHRC..."
+echo "Adding convenience functions to $BASHRC..."
 
 # Auto-activate .venv
 if ! grep -q "source $PROJECT_DIR/.venv/bin/activate" "$BASHRC"; then
@@ -26,5 +26,5 @@ if ! grep -q "source <(kubectl completion bash)" "$BASHRC"; then
   echo "source <(kubectl completion bash)" >> "$BASHRC"
 fi
 
-echo "✅ Shell helpers added. You can run 'source ~/.bashrc' or open a new terminal."
+echo "Shell helpers added. You can run 'source ~/.bashrc' or open a new terminal."
 
