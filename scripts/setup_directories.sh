@@ -16,7 +16,7 @@ if [ ! -d "$HOME/.local/bin" ]; then
 fi
 
 # Add .local/bin to PATH"
-if ! grep -q "export PATH=\$HOME/.local/bin:\$PATH" "$HOME/.bashrc"; then
+if ! grep -q 'export PATH="\\$HOME/\.local/bin:\\$PATH"' "$HOME/.bashrc"; then
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> $HOME/.bashrc
 fi
 
