@@ -4,6 +4,7 @@ import yaml
 import requests
 import logging
 from typing import Dict, List
+from pathlib import Path
 from requests.auth import HTTPBasicAuth
 
 # Logging
@@ -50,7 +51,10 @@ def extract_node_ips(nodes: List[Dict]) -> Dict[str, List[str]]:
 
 
 def main() -> None:
-    config = load_config()
+    config_path = Path("config.yaml")
+    output_path = Path("config.generated.yaml")
+
+    config = load_config(config_path)
 
     username = config.get("hammerspace", {}).get("username")
     password = config.get("hammerspace", {}).get("password")
@@ -73,13 +77,22 @@ def main() -> None:
         roles = extract_node_ips(nodes)
         output[name] = roles
 
-    logger.info("Discovered nodes:")
+        # Inject discovered IPs into the cluster config
+        cluster["discovered"] = roles
+
+    # Write updated config with discovery info
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w") as f:
+        yaml.dump(config, f, sort_keys=False)
+
+    logger.info("✓ Discovered nodes:")
     for cluster, roles in output.items():
         logger.info(f"{cluster}:")
         for role, ips in roles.items():
             logger.info(f"  {role}: {', '.join(ips) or 'none'}")
 
+    logger.info(f"✓ Wrote updated config to {output_path}")
+
 
 if __name__ == "__main__":
     main()
-
