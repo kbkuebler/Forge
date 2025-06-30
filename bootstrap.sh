@@ -52,6 +52,10 @@ fi
 echo "[3] Querying Hammerspace clusters..."
 python3 scripts/query_hammerspace.py
 
+echo "[3] Updating config.yaml..."
+mv config.generated.yaml config.yaml
+
+
 echo -e "${BLUE}---------------------------------------------${NC}"
 echo -e "${GREEN}[4]Generating Configs${NC}"
 echo -e "${BLUE}---------------------------------------------${NC}"
