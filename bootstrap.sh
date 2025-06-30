@@ -13,6 +13,7 @@ echo -e "${BLUE}---------------------------------------------${NC}"
 echo -e "${BLUE}---------------------------------------------${NC}"
 echo -e "${GREEN}[0] Setting up directories...${NC}"
 echo -e "${BLUE}---------------------------------------------${NC}"
+
 bash scripts/setup_directories.sh
 
 echo "Directories created..."

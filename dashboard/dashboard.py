@@ -175,6 +175,5 @@ def create_dashboard():
             for service_name in SERVICES:
                 status = get_service_status(service_name)
                 create_card(service_name, status)
-    # Auto-refresh every 5 seconds
-    ui.timer(5.0, update_all_cards)
+
 

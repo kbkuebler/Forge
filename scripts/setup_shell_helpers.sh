@@ -26,5 +26,11 @@ if ! grep -q "source <(kubectl completion bash)" "$BASHRC"; then
   echo "source <(kubectl completion bash)" >> "$BASHRC"
 fi
 
+#Add .local/bin to PATH
+if ! grep -q "export PATH=\$HOME/.local/bin:\$PATH" "$BASHRC"; then
+  echo -e "\n# Add .local/bin to PATH" >> "$BASHRC"
+  echo "export PATH=\$HOME/.local/bin:\$PATH" >> "$BASHRC"
+fi
+
 echo "Shell helpers added. You can run 'source ~/.bashrc' or open a new terminal."
 
