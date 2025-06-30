@@ -20,25 +20,13 @@ SERVICES = {
     'loki': {'port': 32002, 'deployment': 'loki', 'namespace': 'hammerspace'},
     'fluent-bit': {'port': 32424, 'deployment': 'fluent-bit', 'namespace': 'hammerspace'},
     'csi-nfs-node': {'port': None, 'deployment': 'csi-node', 'namespace': 'kube-system', 'type': 'daemonset'},
-    'mkdocs': {'port': 32010, 'deployment': None, 'namespace': None, 'type': 'static'}
+    'mkdocs': {'port': 32010, 'deployment': 'mkdocs', 'namespace': 'hammerspace'}
 }
 
 
 def get_service_status(service_name):
     service = SERVICES[service_name]
     is_daemonset = service.get('type') == 'daemonset'
-
-    if service.get('type') == 'static':
-        return {
-            'name': service_name,
-            'port': service['port'],
-            'status': 'Available',
-            'replicas': 1,
-            'available_replicas': 1,
-            'type': 'Static Service',
-            'last_update': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'versions': []
-        }
 
     status = {
         'name': service_name,
@@ -58,6 +46,7 @@ def get_service_status(service_name):
             status['available_replicas'] = ds.status.number_available or 0
             status['status'] = 'Running' if status['available_replicas'] > 0 else 'Not Available'
 
+            # Image versions
             containers = ds.spec.template.spec.containers
             status['versions'] = [c.image.split(':')[-1] if ':' in c.image else 'latest' for c in containers]
 
@@ -87,6 +76,7 @@ def get_service_status(service_name):
             status['available_replicas'] = deploy.status.available_replicas or 0
             status['status'] = 'Running' if status['available_replicas'] > 0 else 'Not Available'
 
+            # Image versions
             containers = deploy.spec.template.spec.containers
             status['versions'] = [c.image.split(':')[-1] if ':' in c.image else 'latest' for c in containers]
 
@@ -105,13 +95,14 @@ def create_card_content(service_name, status):
             ui.label(service_name).classes('text-lg font-bold')
             ui.label(status['status']).classes(
                 f'px-2 py-1 rounded text-white ' +
-                ('bg-green-500' if status['status'] in {'Running', 'Available'} else
+                ('bg-green-500' if status['status'] == 'Running' else
                  'bg-yellow-500' if status['status'] == 'Not Available' else
                  'bg-red-500')
             )
 
         ui.badge(status['type'], color='blue').props('dense outline')
 
+        # Show image versions
         if status['versions']:
             ui.label(f"Version(s): {', '.join(status['versions'])}")
 
@@ -121,7 +112,8 @@ def create_card_content(service_name, status):
             if is_csi:
                 ui.label(f"Nodes: {status['available_replicas']}/{status['replicas']}")
 
-            if service_name in {'grafana', 'prometheus', 'mkdocs'} and status['port']:
+            # Only show links for Grafana and Prometheus
+            if service_name in {'grafana', 'prometheus'} and status['port']:
                 with ui.row().classes('items-center'):
                     ui.label("Access:")
                     url = f"http://{SERVER_ADDRESS}:{status['port']}"
@@ -148,8 +140,6 @@ def create_card(service_name, status):
 
 def update_all_cards():
     for service_name in SERVICES:
-        if SERVICES[service_name].get('type') == 'static':
-            continue  # No need to refresh static services
         status = get_service_status(service_name)
         if service_name in service_cards:
             card = service_cards[service_name]
@@ -166,15 +156,15 @@ def create_dashboard():
             .classes('bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded').props('flat')
 
     with ui.column().classes('w-full p-4'):
+        # Docs link section
         with ui.row().classes('w-full justify-end mb-2'):
             ui.link("📘 View Documentation", f"http://{SERVER_ADDRESS}:32010")\
                 .classes('text-blue-600 underline hover:text-blue-800 text-sm')\
                 .props('target=_blank')
 
+        # Service cards
         with ui.row().classes('w-full flex-wrap gap-4'):
             for service_name in SERVICES:
                 status = get_service_status(service_name)
                 create_card(service_name, status)
-    # Auto-refresh every 5 seconds
-    ui.timer(5.0, update_all_cards)
 
