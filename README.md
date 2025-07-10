@@ -40,7 +40,7 @@ admin@forge.twocupsof.coffee> syslog-config --enable --server 192.168.1.23,32424
 
 ## Installation
 
-First clone the repository:
+First clone the repository to your home directory:
 ```bash
 git clone https://github.com/kbkuebler/Forge.git
 ``` 
@@ -48,8 +48,8 @@ git clone https://github.com/kbkuebler/Forge.git
 Then run the modify the config.yaml file to match your environment:
 ```bash
 clusters:
-  - name: forge.twocupsof.coffee
-    cluster_ip: 192.168.100.200
+  - name: your_cluster_name.tld
+    cluster_ip: n.n.n.n #your_cluster_ip
     ports:
       metrics: 9100
       api: 9101
@@ -58,9 +58,16 @@ clusters:
     labels:
       env: lab
       region: east
+
+### Make sure to enter your Hammerspace admin credentials here.
+### These are used to query the cluster for node information.
+### Example: username: admin, password: 1Hammerspace! 
+hammerspace:
+  username: admin #Or add a service account
+  password: admin_creds
 ```
 
-Then run the bootstrap script:
+Then run the bootstrap script as a regular user:
 ```bash
 ./bootstrap.sh
 ```
