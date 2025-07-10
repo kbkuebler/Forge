@@ -3,9 +3,9 @@
 set -e
 
 SERVICE_NAME=forge-dashboard
-DASHBOARD_DIR=$(dirname "$(readlink -f "$0")")/..
+DASHBOARD_DIR=$FORGE_DIR/dashboard
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-PYTHON_EXEC=$(which python3)
+PYTHON_EXEC=$($FORGE_DIR/.venv/bin/python3)
 USER_NAME=$(whoami)
 
 echo "[+] Installing ${SERVICE_NAME} as a systemd service..."
