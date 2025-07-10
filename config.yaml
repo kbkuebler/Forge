@@ -1,6 +1,7 @@
 clusters:
-  - name: forge.twocupsof.coffee
-    cluster_ip: 192.168.100.200
+### Enter your cluster configuration here
+  - name:
+    cluster_ip:
     ports:
       metrics: 9100
       api: 9101
@@ -10,9 +11,12 @@ clusters:
       env: lab
       region: east
 
+### Make sure to enter your Hammerspace admin credentials here.
+### These are used to query the cluster for node information.
+### Example: username: admin, password: 1Hammerspace! 
 hammerspace:
-  username: admin
-  password: 1Hammerspace!
+  username:
+  password:
 
 apps:
   grafana: true
