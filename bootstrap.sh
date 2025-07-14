@@ -37,7 +37,7 @@ bash scripts/setup_directories.sh
 echo "Directories created..."
 # 1. ENVIRONMENT SETUP
 
-export FORGE_DIR=$(pwd)
+ FORGE_DIR=$(pwd)
 echo "FORGE_DIR: $FORGE_DIR"
 
 echo "[1] Installing Python and requirements..."
