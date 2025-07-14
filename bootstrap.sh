@@ -128,7 +128,7 @@ echo "Launching SE Dashboard..."
 echo -e "${BLUE}---------------------------------------------${NC}"
 export SERVER_ADDRESS=$(hostname -I | awk '{print $1}')
 # python3 dashboard/launch_dashboard.py &
-bash scripts/install_dashboard_service.sh
+bash scripts/install_dash_service.sh
 sleep 5
 echo -e "${BLUE}---------------------------------------------${NC}"
 
