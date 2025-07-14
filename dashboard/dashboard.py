@@ -23,8 +23,76 @@ SERVICES = {
 service_cards = {}
 
 def get_service_status(service_name):
-    # (same as your current version, no changes needed here)
-    ...
+    service = SERVICES[service_name]
+    is_daemonset = service.get('type') == 'daemonset'
+
+    if service.get('type') == 'static':
+        return {
+            'name': service_name,
+            'port': service['port'],
+            'status': 'Available',
+            'replicas': 1,
+            'available_replicas': 1,
+            'type': 'Static Service',
+            'last_update': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'versions': []
+        }
+
+    status = {
+        'name': service_name,
+        'port': service['port'],
+        'status': 'Unknown',
+        'replicas': 0,
+        'available_replicas': 0,
+        'type': 'DaemonSet' if is_daemonset else 'Deployment',
+        'last_update': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'versions': []
+    }
+
+    try:
+        if is_daemonset:
+            ds = apps_v1.read_namespaced_daemon_set(service['deployment'], service['namespace'])
+            status['replicas'] = ds.status.desired_number_scheduled or 0
+            status['available_replicas'] = ds.status.number_available or 0
+            status['status'] = 'Running' if status['available_replicas'] > 0 else 'Not Available'
+
+            containers = ds.spec.template.spec.containers
+            status['versions'] = [c.image.split(':')[-1] if ':' in c.image else 'latest' for c in containers]
+
+            pods = v1.list_namespaced_pod(
+                namespace=service['namespace'],
+                label_selector="app.kubernetes.io/name=csi-nfs-node"
+            )
+            status['pods'] = [
+                {
+                    'name': pod.metadata.name,
+                    'status': pod.status.phase,
+                    'node': pod.spec.node_name,
+                    'containers': [
+                        {
+                            'name': c.name,
+                            'ready': c.ready,
+                            'restart_count': c.restart_count
+                        }
+                        for c in pod.status.container_statuses or []
+                    ]
+                }
+                for pod in pods.items
+            ]
+        else:
+            deploy = apps_v1.read_namespaced_deployment(service['deployment'], service['namespace'])
+            status['replicas'] = deploy.status.replicas or 0
+            status['available_replicas'] = deploy.status.available_replicas or 0
+            status['status'] = 'Running' if status['available_replicas'] > 0 else 'Not Available'
+
+            containers = deploy.spec.template.spec.containers
+            status['versions'] = [c.image.split(':')[-1] if ':' in c.image else 'latest' for c in containers]
+
+    except Exception as e:
+        status['error'] = str(e)
+        status['status'] = 'Error'
+
+    return status  # <- Ensure this always returns a dict
 
 def create_card_content(service_name, status, server_address):
     is_csi = service_name == 'csi-nfs-node'
