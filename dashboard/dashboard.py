@@ -10,7 +10,16 @@ config.load_kube_config()
 v1 = CoreV1Api()
 apps_v1 = AppsV1Api()
 
+def get_primary_ip():
+    try:
+        # Use a UDP socket to a public IP to determine the outbound interface
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("1.1.1.1", 80))
+            return s.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"  # fallback if something goes wrong
 
+SERVER_ADDRESS = get_primary_ip()
 
 # Define services
 SERVICES = {
