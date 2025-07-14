@@ -2,6 +2,14 @@
 ### This will install the dashboard as a systemd service
 set -e
 
+# Default FORGE_DIR to current working dir if not set
+FORGE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+PYTHON_EXEC="$FORGE_DIR/.venv/bin/python3"
+
+USER_NAME=$(whoami)
+
+
 SERVICE_NAME=forge-dashboard
 DASHBOARD_DIR=$FORGE_DIR/dashboard
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
@@ -9,8 +17,8 @@ PYTHON_EXEC="${FORGE_DIR}/.venv/bin/python3"
 
 USER_NAME=$(whoami)
 
-echo $PYTHON_EXEC
-echo "[+] Installing ${SERVICE_NAME} as a systemd service..."
+echo "Python Exec: $PYTHON_EXEC"
+echo "[SERVICE] Installing ${SERVICE_NAME} as a systemd service..."
 
 # Create systemd unit file
 sudo tee "$UNIT_FILE" > /dev/null <<EOF
@@ -23,7 +31,7 @@ ExecStart=${PYTHON_EXEC} ${DASHBOARD_DIR}/launch_dashboard.py
 WorkingDirectory=${DASHBOARD_DIR}
 Restart=always
 User=${USER_NAME}
-Environment=SERVER_ADDRESS=localhost
+Environment=KUBECONFIG=/home/hammerspace/.kube/config
 
 [Install]
 WantedBy=multi-user.target
@@ -37,4 +45,4 @@ sudo systemctl daemon-reexec
 sudo systemctl daemon-reload
 sudo systemctl enable --now "${SERVICE_NAME}"
 
-echo "${SERVICE_NAME} is now running. Access it at http://localhost:8080"
+echo "${SERVICE_NAME} should now be running on port 8080..."
