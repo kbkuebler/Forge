@@ -5,17 +5,12 @@ set -e
 # Default FORGE_DIR to current working dir if not set
 FORGE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-PYTHON_EXEC="$FORGE_DIR/.venv/bin/python3"
-
-USER_NAME=$(whoami)
-
-
 SERVICE_NAME=forge-dashboard
-DASHBOARD_DIR=$FORGE_DIR/dashboard
+DASHBOARD_DIR="$FORGE_DIR/dashboard"
 UNIT_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-PYTHON_EXEC="${FORGE_DIR}/.venv/bin/python3"
-
+PYTHON_EXEC="$FORGE_DIR/.venv/bin/python3"
 USER_NAME=$(whoami)
+USER_HOME=$(eval echo "~$USER_NAME")
 
 echo "Python Exec: $PYTHON_EXEC"
 echo "[SERVICE] Installing ${SERVICE_NAME} as a systemd service..."
@@ -31,7 +26,7 @@ ExecStart=${PYTHON_EXEC} ${DASHBOARD_DIR}/launch_dashboard.py
 WorkingDirectory=${DASHBOARD_DIR}
 Restart=always
 User=${USER_NAME}
-Environment=KUBECONFIG=/home/hammerspace/.kube/config
+Environment=KUBECONFIG=${USER_HOME}/.kube/config
 
 [Install]
 WantedBy=multi-user.target

@@ -1,14 +1,25 @@
 # dashboard.py
 import os
 from datetime import datetime
+from pathlib import Path
 from kubernetes import client, config
 from kubernetes.client import CoreV1Api, AppsV1Api
+from kubernetes.config.config_exception import ConfigException
 from nicegui import ui
 
 # Kubernetes client setup
-config.load_kube_config()
+kubeconfig_path = str(Path("~/.kube/config").expanduser())
+
+try:
+    print(f"[DEBUG] Loading kubeconfig from {kubeconfig_path}")
+    config.load_kube_config(config_file=kubeconfig_path)
+except ConfigException as e:
+    print(f"[ERROR] Failed to load kubeconfig from {kubeconfig_path}: {e}")
+    exit(1)
+
 v1 = CoreV1Api()
 apps_v1 = AppsV1Api()
+
 
 # Define services
 SERVICES = {
